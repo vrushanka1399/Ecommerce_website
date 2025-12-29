@@ -1,36 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Modal, Button, Table, Image } from 'react-bootstrap';
-
-const cartElements = [
-  {
-    title: 'Colors',
-    price: 100,
-    imageUrl:
-      'https://prasadyash2411.github.io/ecom-website/img/Album%201.png',
-    quantity: 2,
-  },
-  {
-    title: 'Black and white Colors',
-    price: 50,
-    imageUrl:
-      'https://prasadyash2411.github.io/ecom-website/img/Album%202.png',
-    quantity: 3,
-  },
-  {
-    title: 'Yellow and Black Colors',
-    price: 70,
-    imageUrl:
-      'https://prasadyash2411.github.io/ecom-website/img/Album%203.png',
-    quantity: 1,
-  },
-];
+import CartContext from './store/CartContext';
 
 const Cart = () => {
+  const cartCtx = useContext(CartContext);
+
+  const items = cartCtx.items;
+
   const [show, setShow] = useState(false);
-  const [items, setItems] = useState(cartElements);
 
   const removeItemHandler = (title) => {
-    setItems((prev) => prev.filter((item) => item.title !== title));
+    cartCtx.removeItem(title);
   };
 
   return (
@@ -38,7 +18,9 @@ const Cart = () => {
       {/* Cart icon button top right */}
       <div style={{ textAlign: 'right', margin: '20px' }}>
         <Button variant="dark" onClick={() => setShow(true)}>
-          ?? Cart ({items.length})
+          ?? Cart (
+          {items.reduce((total, item) => total + item.quantity, 0)}
+          )
         </Button>
       </div>
 
@@ -71,8 +53,11 @@ const Cart = () => {
                     />
                     {item.title}
                   </td>
+
                   <td>?{item.price}</td>
+
                   <td>{item.quantity}</td>
+
                   <td>
                     <Button
                       variant="danger"
