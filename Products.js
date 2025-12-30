@@ -1,62 +1,86 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
+import React, { useState, useRef } from "react";
+import { Button, Spinner } from "react-bootstrap";
 
-const productsArr = [
-  { title: "Colors", price: 100, imageUrl: "https://prasadyash2411.github.io/ecom-website/img/Album%201.png" },
-  { title: "Black and white Colors", price: 50, imageUrl: "https://prasadyash2411.github.io/ecom-website/img/Album%202.png" },
-  { title: "Yellow and Black Colors", price: 70, imageUrl: "https://prasadyash2411.github.io/ecom-website/img/Album%203.png" },
-  { title: "Blue Color", price: 100, imageUrl: "https://prasadyash2411.github.io/ecom-website/img/Album%204.png" }
-];
-
-const Products = () => {
-  const [items, setItems] = useState([]);
+function Products() {
+  const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const retryTimer = useRef(null);
 
-  const fetchProductsHandler = async () => {
-    setIsLoading(true);   // ?? show loader
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      setError("");
 
-    // simulate backend fetch
-    setTimeout(() => {
-      setItems(productsArr);   // ?? data loaded
-      setIsLoading(false);     // ?? hide loader
-    }, 1500);
+      // ?? replace this URL with your actual backend later
+      const response = await fetch("https://swapi.dev/api/films");
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      const data = await response.json();
+
+      // simulate products coming
+      setProducts(data.results);
+      setIsLoading(false);
+
+      // ? important: stop retry when success
+      if (retryTimer.current) clearTimeout(retryTimer.current);
+
+    } catch (err) {
+      setIsLoading(false);
+
+      // ?? required message
+      setError("Something went wrong... Retrying");
+
+      // ? retry again in 5 seconds
+      retryTimer.current = setTimeout(() => {
+        fetchProducts();
+      }, 5000);
+    }
+  };
+
+  const cancelRetryHandler = () => {
+    if (retryTimer.current) {
+      clearTimeout(retryTimer.current);
+    }
+    setError("Retry cancelled");
   };
 
   return (
-    <Container className="mt-4">
+    <div className="text-center">
 
-      <div className="text-center mb-3">
-        <Button onClick={fetchProductsHandler}>Load Products</Button>
-      </div>
+      <Button onClick={fetchProducts} className="mb-3">
+        Fetch Products
+      </Button>
 
-      {/* ?? Show loader while fetching */}
       {isLoading && (
-        <div className="text-center">
+        <div>
           <Spinner animation="border" />
-          <p>Loading products...</p>
+          <p>Loading...</p>
         </div>
       )}
 
-      {/* ?? Show products only when not loading */}
-      {!isLoading && (
-        <Row>
-          {items.map((item, index) => (
-            <Col md={3} key={index} className="mb-4">
-              <Card>
-                <Card.Img variant="top" src={item.imageUrl} />
-                <Card.Body>
-                  <Card.Title>{item.title}</Card.Title>
-                  <Card.Text>?{item.price}</Card.Text>
-                  <Button>Add to Cart</Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+      {error && (
+        <div>
+          <p style={{ color: "red" }}>{error}</p>
+          <Button variant="danger" onClick={cancelRetryHandler}>
+            Cancel Retry
+          </Button>
+        </div>
       )}
 
-    </Container>
+      {!isLoading && products.length > 0 && (
+        <ul>
+          {products.map((product, index) => (
+            <li key={index}>{product.title}</li>
+          ))}
+        </ul>
+      )}
+
+    </div>
   );
-};
+}
 
 export default Products;
