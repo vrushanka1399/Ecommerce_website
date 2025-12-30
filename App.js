@@ -5,28 +5,31 @@ import Cart from './Cart';
 
 import { Routes, Route, NavLink } from "react-router-dom";
 import About from "./About";
+import Home from "./Home";
 
 function App() {
   return (
     <div>
 
-      {/* Simple Navbar */}
-      <nav style={{ padding: '10px', background: '#f2f2f2' }}>
-        <NavLink to="/" style={{ marginRight: '20px' }}>
-          Home
-        </NavLink>
-
-        <NavLink to="/about">
-          About
-        </NavLink>
+      {/* Navbar */}
+      <nav style={{
+        padding: '15px',
+        background: '#f2f2f2',
+        display: 'flex',
+        gap: '20px'
+      }}>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/products">Store</NavLink>
+        <NavLink to="/about">About</NavLink>
       </nav>
 
-      {/* Cart button */}
       <Cart />
 
-      {/* Routes decide which page to show */}
+      {/* Route mapping */}
       <Routes>
-        <Route path="/" element={
+        <Route path="/" element={<Home />} />
+
+        <Route path="/products" element={
           <>
             <h2 className="text-center mt-3">Products</h2>
             <Products />
