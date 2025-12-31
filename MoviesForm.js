@@ -1,75 +1,67 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 
-function MoviesForm() {
+function MoviesForm({ onAddMovie }) {
   const [title, setTitle] = useState("");
   const [openingText, setOpeningText] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
 
-  const onSubmitHandler = useCallback(
-    (e) => {
-      e.preventDefault();
+  const submitHandler = useCallback(async (event) => {
+    event.preventDefault();
 
-      const newMovie = {
-        title: title.trim(),
-        openingText: openingText.trim(),
-        releaseDate
-      };
+    const movie = {
+      title,
+      openingText,
+      releaseDate,
+    };
 
-      console.log("NewMovieObj:", newMovie);
+    // POST to Firebase
+    const response = await fetch(
+      "https://YOUR-PROJECT-ID.firebaseio.com/movies.json",
+      {
+        method: "POST",
+        body: JSON.stringify(movie),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-      // clear inputs after submit
-      setTitle("");
-      setOpeningText("");
-      setReleaseDate("");
-    },
-    [title, openingText, releaseDate]
-  );
+    const data = await response.json();
 
-  // not necessary, but shows memoization usage
-  const isFormValid = useMemo(() => {
-    return title.trim() !== "" && openingText.trim() !== "" && releaseDate !== "";
-  }, [title, openingText, releaseDate]);
+    // notify parent App component
+    onAddMovie({ id: data.name, ...movie });
+
+    // clear form
+    setTitle("");
+    setOpeningText("");
+    setReleaseDate("");
+  }, [title, openingText, releaseDate, onAddMovie]);
 
   return (
-    <div style={{ maxWidth: "600px", margin: "20px auto" }}>
+    <form onSubmit={submitHandler}>
       <h2>Add Movie</h2>
 
-      <form onSubmit={onSubmitHandler}>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={{ width: "100%" }}
-          />
-        </div>
+      <input
+        type="text"
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
 
-        <div style={{ marginBottom: "10px" }}>
-          <label>Opening Text</label>
-          <textarea
-            rows="3"
-            value={openingText}
-            onChange={(e) => setOpeningText(e.target.value)}
-            style={{ width: "100%" }}
-          />
-        </div>
+      <textarea
+        placeholder="Opening Text"
+        value={openingText}
+        onChange={(e) => setOpeningText(e.target.value)}
+      />
 
-        <div style={{ marginBottom: "10px" }}>
-          <label>Release Date</label>
-          <input
-            type="date"
-            value={releaseDate}
-            onChange={(e) => setReleaseDate(e.target.value)}
-            style={{ width: "100%" }}
-          />
-        </div>
+      <input
+        type="date"
+        value={releaseDate}
+        onChange={(e) => setReleaseDate(e.target.value)}
+      />
 
-        <button type="submit" disabled={!isFormValid}>
-          Add Movie
-        </button>
-      </form>
-    </div>
+      <button type="submit">Add Movie</button>
+    </form>
   );
 }
 
