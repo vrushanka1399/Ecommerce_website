@@ -1,77 +1,65 @@
-﻿import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+﻿import React from "react";
+import { Link } from "react-router-dom";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
+
+const productsArr = [
+  {
+    id: "p1",
+    title: "Colors",
+    price: 100,
+    imageUrl: "https://prasadyash2411.github.io/ecom-website/img/Album%201.png",
+  },
+  {
+    id: "p2",
+    title: "Black and white Colors",
+    price: 50,
+    imageUrl: "https://prasadyash2411.github.io/ecom-website/img/Album%202.png",
+  },
+  {
+    id: "p3",
+    title: "Yellow and Black Colors",
+    price: 70,
+    imageUrl: "https://prasadyash2411.github.io/ecom-website/img/Album%203.png",
+  },
+  {
+    id: "p4",
+    title: "Blue Color",
+    price: 100,
+    imageUrl: "https://prasadyash2411.github.io/ecom-website/img/Album%204.png",
+  },
+];
 
 function Products() {
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const retryTimer = useRef(null);
-
-  // 🔹 1) Memoized fetch function
-  const fetchProductsHandler = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError("");
-
-      const response = await fetch("https://swapi.dev/api/films");
-
-      if (!response.ok) {
-        throw new Error("Request failed");
-      }
-
-      const data = await response.json();
-
-      setProducts(data.results);
-      setIsLoading(false);
-
-      if (retryTimer.current) clearTimeout(retryTimer.current); // stop retry when success
-
-    } catch (err) {
-      setIsLoading(false);
-      setError("Something went wrong...Retrying");
-
-      retryTimer.current = setTimeout(() => {
-        fetchProductsHandler();           // 🔁 retry after 5 sec
-      }, 5000);
-    }
-  }, []);
-
-  // 🔹 2) Auto-call API on page load
-  useEffect(() => {
-    fetchProductsHandler();
-    return () => {
-      if (retryTimer.current) clearTimeout(retryTimer.current);
-    };
-  }, [fetchProductsHandler]);
-
-  // 🔹 3) Optional performance optimization
-  const totalProducts = useMemo(() => products.length, [products]);
-
   return (
-    <div>
-      {isLoading && <p>Loading...</p>}
+    <Container className="mt-4">
+      <h2 className="text-center mb-4">Products</h2>
 
-      {error && (
-        <div>
-          <p style={{ color: "red" }}>{error}</p>
-          <button onClick={() => clearTimeout(retryTimer.current)}>
-            Cancel Retry
-          </button>
-        </div>
-      )}
+      <Row>
+        {productsArr.map((item) => (
+          <Col md={3} key={item.id} className="mb-4">
 
-      {!isLoading && !error && (
-        <>
-          <p>Total products: {totalProducts}</p>
+            {/* 👇 Entire card is clickable */}
+            <Link
+              to={`/products/${item.id}`}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <Card>
+                <Card.Img variant="top" src={item.imageUrl} />
 
-          <ul>
-            {products.map((p, i) => (
-              <li key={i}>{p.title}</li>
-            ))}
-          </ul>
-        </>
-      )}
-    </div>
+                <Card.Body>
+                  <Card.Title>{item.title}</Card.Title>
+                  <Card.Text>₹{item.price}</Card.Text>
+
+                  {/* Add to Cart button (no logic yet, as per task) */}
+                  <Button variant="primary">Add to Cart</Button>
+                </Card.Body>
+              </Card>
+            </Link>
+
+          </Col>
+        ))}
+      </Row>
+    </Container>
   );
 }
 
