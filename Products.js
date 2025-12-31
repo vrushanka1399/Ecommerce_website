@@ -1,18 +1,18 @@
-import React, { useState, useRef } from "react";
-import { Button, Spinner } from "react-bootstrap";
+﻿import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 function Products() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
   const retryTimer = useRef(null);
 
-  const fetchProducts = async () => {
+  // 🔹 1) Memoized fetch function
+  const fetchProductsHandler = useCallback(async () => {
     try {
       setIsLoading(true);
       setError("");
 
-      // ?? replace this URL with your actual backend later
       const response = await fetch("https://swapi.dev/api/films");
 
       if (!response.ok) {
@@ -21,64 +21,56 @@ function Products() {
 
       const data = await response.json();
 
-      // simulate products coming
       setProducts(data.results);
       setIsLoading(false);
 
-      // ? important: stop retry when success
-      if (retryTimer.current) clearTimeout(retryTimer.current);
+      if (retryTimer.current) clearTimeout(retryTimer.current); // stop retry when success
 
     } catch (err) {
       setIsLoading(false);
+      setError("Something went wrong...Retrying");
 
-      // ?? required message
-      setError("Something went wrong... Retrying");
-
-      // ? retry again in 5 seconds
       retryTimer.current = setTimeout(() => {
-        fetchProducts();
+        fetchProductsHandler();           // 🔁 retry after 5 sec
       }, 5000);
     }
-  };
+  }, []);
 
-  const cancelRetryHandler = () => {
-    if (retryTimer.current) {
-      clearTimeout(retryTimer.current);
-    }
-    setError("Retry cancelled");
-  };
+  // 🔹 2) Auto-call API on page load
+  useEffect(() => {
+    fetchProductsHandler();
+    return () => {
+      if (retryTimer.current) clearTimeout(retryTimer.current);
+    };
+  }, [fetchProductsHandler]);
+
+  // 🔹 3) Optional performance optimization
+  const totalProducts = useMemo(() => products.length, [products]);
 
   return (
-    <div className="text-center">
-
-      <Button onClick={fetchProducts} className="mb-3">
-        Fetch Products
-      </Button>
-
-      {isLoading && (
-        <div>
-          <Spinner animation="border" />
-          <p>Loading...</p>
-        </div>
-      )}
+    <div>
+      {isLoading && <p>Loading...</p>}
 
       {error && (
         <div>
           <p style={{ color: "red" }}>{error}</p>
-          <Button variant="danger" onClick={cancelRetryHandler}>
+          <button onClick={() => clearTimeout(retryTimer.current)}>
             Cancel Retry
-          </Button>
+          </button>
         </div>
       )}
 
-      {!isLoading && products.length > 0 && (
-        <ul>
-          {products.map((product, index) => (
-            <li key={index}>{product.title}</li>
-          ))}
-        </ul>
-      )}
+      {!isLoading && !error && (
+        <>
+          <p>Total products: {totalProducts}</p>
 
+          <ul>
+            {products.map((p, i) => (
+              <li key={i}>{p.title}</li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }
