@@ -1,4 +1,4 @@
-﻿import { NavLink } from "react-router-dom";
+﻿import { NavLink, useHistory } from "react-router-dom";
 import { useContext } from "react";
 import AuthContext from "./AuthContext";
 
@@ -6,14 +6,15 @@ function Navbar() {
 
   // 👉 get auth context
   const authCtx = useContext(AuthContext);
-
+  const history = useHistory();
   // 👉 boolean flag
   const isLoggedIn = authCtx.isLoggedIn;
 
   // 👉 logout function
-  const logoutHandler = () => {
-    authCtx.logout();
-  };
+const logoutHandler = () => {
+  authCtx.logout();        // ✔ clears token + localStorage
+  history.push("/login");  // ✔ redirect to login page
+};
 
   return (
     <nav
