@@ -6,6 +6,7 @@ import About from "./About";
 import Home from "./Home";
 import Navbar from "./Navbar";
 import ProductDetail from "./ProductDetail";   // 👈 ADD THIS FILE
+import SignUp from "./SignUp";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
 
         <Route path="/about" component={About} />
         <Route path="/contact" component={ContactUs} />
+        <Route path="/signup" component={SignUp} />
       </Switch>
     </BrowserRouter>
   );

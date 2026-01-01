@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+﻿import { NavLink } from "react-router-dom";
 
 function Navbar() {
   return (
@@ -24,10 +24,13 @@ function Navbar() {
         About
       </NavLink>
 
-      {/* ?? ADD THIS */}
+      {/* 👉 ADD THIS */}
       <NavLink to="/contact" style={{ color: "white" }}>
         Contact Us
       </NavLink>
+      <NavLink to="/signup" style={{ color: "white" }}>
+  Sign Up
+</NavLink>
     </nav>
   );
 }
