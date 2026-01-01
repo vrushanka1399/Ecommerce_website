@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 
 const AuthContext = React.createContext({
   token: "",
@@ -17,50 +17,36 @@ export const AuthContextProvider = (props) => {
   const loginHandler = (token) => {
     setToken(token);
     localStorage.setItem("token", token);
+
+      const expirationTime = new Date().getTime() + 5 * 60 * 1000;
+  localStorage.setItem("expirationTime", expirationTime.toString());
   };
 
   const logoutHandler = () => {
     setToken(null);
-    localStorage.removeItem("token");
+      localStorage.removeItem("token");
+  localStorage.removeItem("expirationTime");
   };
 
-  // ?? Validate token with Firebase on app load
-  useEffect(() => {
-    const validateToken = async () => {
-      if (!storedToken) return;
+  // 🔥 Validate token with Firebase on app load
+useEffect(() => {
+  const storedToken = localStorage.getItem("token");
+  const storedExpiration = localStorage.getItem("expirationTime");
 
-      try {
-        const response = await fetch(
-          "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=YOUR_FIREBASE_API_KEY",
-          {
-            method: "POST",
-            body: JSON.stringify({
-              idToken: storedToken,
-            }),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+  if (!storedToken || !storedExpiration) {
+    return;
+  }
 
-        const data = await response.json();
+  const currentTime = new Date().getTime();
 
-        if (!response.ok) {
-          // ? invalid / expired / revoked ? log out user
-          logoutHandler();
-          return;
-        }
-
-        // ? token valid ? keep logged in (nothing else to do)
-      } catch (err) {
-        // ? network / error ? log out to be safe
-        logoutHandler();
-      }
-    };
-
-    validateToken();
-  }, []); // run only once on app load
-
+  if (currentTime >= +storedExpiration) {
+    // token expired
+    logoutHandler();
+  } else {
+    // still valid → keep token
+    setToken(storedToken);
+  }
+}, []);
   const contextValue = {
     token: token,
     isLoggedIn: userIsLoggedIn,
