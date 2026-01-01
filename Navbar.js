@@ -28,9 +28,12 @@ function Navbar() {
       <NavLink to="/contact" style={{ color: "white" }}>
         Contact Us
       </NavLink>
-      <NavLink to="/signup" style={{ color: "white" }}>
-  Sign Up
-</NavLink>
+    <NavLink to="/signup" style={{ color: "white" }}>
+      Sign Up
+    </NavLink>
+    <NavLink to="/login" style={{ color: "white" }}>
+      Login
+    </NavLink>
     </nav>
   );
 }

@@ -1,5 +1,5 @@
 ﻿import { BrowserRouter, Route, Switch } from "react-router-dom";
-
+import Login from "./Login";
 import ContactUs from "./ContactUs";
 import Products from "./Products";
 import About from "./About";
@@ -24,7 +24,8 @@ function App() {
 
         <Route path="/about" component={About} />
         <Route path="/contact" component={ContactUs} />
-        <Route path="/signup" component={SignUp} />
+        <Route path="/signup" component={SignUp} />     
+        <Route path="/login" component={Login} />
       </Switch>
     </BrowserRouter>
   );
