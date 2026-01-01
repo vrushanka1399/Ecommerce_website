@@ -1,6 +1,9 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, useContext } from "react";
+import AuthContext from "./AuthContext";
 
 function Login() {
+  const authCtx = useContext(AuthContext);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -37,9 +40,8 @@ function Login() {
 
       setIsLoading(false);
 
-      // 🔥 JWT TOKEN (idToken)
-      console.log("LOGIN SUCCESS — TOKEN BELOW ⬇⬇⬇");
-      console.log(data.idToken);
+      // 🔥 Store token in Context + localStorage
+      authCtx.login(data.idToken);
 
       alert("Login Successful!");
 
@@ -74,13 +76,11 @@ function Login() {
           />
         </div>
 
-        {/* 🔹 loader instead of button text */}
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Sending request..." : "Login"}
         </button>
       </form>
 
-      {/* 🔹 show server error */}
       {error && (
         <p style={{ color: "red", marginTop: "10px" }}>
           {error}

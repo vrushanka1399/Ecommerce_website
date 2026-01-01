@@ -1,6 +1,20 @@
 ﻿import { NavLink } from "react-router-dom";
+import { useContext } from "react";
+import AuthContext from "./AuthContext";
 
 function Navbar() {
+
+  // 👉 get auth context
+  const authCtx = useContext(AuthContext);
+
+  // 👉 boolean flag
+  const isLoggedIn = authCtx.isLoggedIn;
+
+  // 👉 logout function
+  const logoutHandler = () => {
+    authCtx.logout();
+  };
+
   return (
     <nav
       style={{
@@ -24,16 +38,35 @@ function Navbar() {
         About
       </NavLink>
 
-      {/* 👉 ADD THIS */}
       <NavLink to="/contact" style={{ color: "white" }}>
         Contact Us
       </NavLink>
-    <NavLink to="/signup" style={{ color: "white" }}>
-      Sign Up
-    </NavLink>
-    <NavLink to="/login" style={{ color: "white" }}>
-      Login
-    </NavLink>
+
+      {!isLoggedIn && (
+        <NavLink to="/login" style={{ color: "white" }}>
+          Login
+        </NavLink>
+      )}
+
+      {isLoggedIn && (
+        <>
+          <NavLink to="/profile" style={{ color: "white" }}>
+            Profile
+          </NavLink>
+
+          <button
+            onClick={logoutHandler}
+            style={{
+              background: "transparent",
+              border: "1px solid white",
+              color: "white",
+              cursor: "pointer"
+            }}
+          >
+            Logout
+          </button>
+        </>
+      )}
     </nav>
   );
 }
