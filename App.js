@@ -1,13 +1,15 @@
 ﻿import { BrowserRouter, Route, Switch } from "react-router-dom";
+
 import Login from "./Login";
 import ContactUs from "./ContactUs";
 import Products from "./Products";
 import About from "./About";
 import Home from "./Home";
 import Navbar from "./Navbar";
-import ProductDetail from "./ProductDetail";   // 👈 ADD THIS FILE
+import ProductDetail from "./ProductDetail";
 import SignUp from "./SignUp";
 import Profile from "./Profile";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   return (
@@ -15,17 +17,26 @@ function App() {
       <Navbar />
 
       <Switch>
+        {/* Home */}
         <Route path="/" exact component={Home} />
 
-        {/* 👇 MAKE THIS EXACT */}
-        <Route path="/products" exact component={Products} />
+        {/* 🔒 Protected Products Page */}
+        <ProtectedRoute
+          exact
+          path="/products"
+          component={Products}
+        />
 
-        {/* 👇 DYNAMIC ROUTE FOR PRODUCT DETAILS */}
-        <Route path="/products/:productId" component={ProductDetail} />
+        {/* 👇 Product Detail Dynamic Route */}
+        <Route
+          path="/products/:productId"
+          component={ProductDetail}
+        />
 
+        {/* Other routes */}
         <Route path="/about" component={About} />
         <Route path="/contact" component={ContactUs} />
-        <Route path="/signup" component={SignUp} />     
+        <Route path="/signup" component={SignUp} />
         <Route path="/login" component={Login} />
         <Route path="/profile" component={Profile} />
       </Switch>
@@ -33,4 +44,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;
