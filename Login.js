@@ -19,7 +19,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=YOUR_FIREBASE_API_KEY",
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBo8Pwmbti299m4tq4c--iyz2pdn5uB2S8",
         {
           method: "POST",
           body: JSON.stringify({
@@ -42,7 +42,7 @@ function Login() {
       setIsLoading(false);
 
       // 🔥 store token in context + localStorage
-      authCtx.login(data.idToken);
+      authCtx.login(data.idToken, data.email);
 
       // 🚀 redirect to products page
       history.push("/products");
